@@ -1,0 +1,19 @@
+[package]
+name = "parser-ts"
+version = "0.0.1"
+authors.workspace = true
+
+[lib]
+crate-type = ["dylib"]
+
+[dependencies]
+tree-sitter = "=0.20.9"
+tree-sitter-typescript = "=0.20.2"
+
+[features]
+# You can use features to enable or disable functionality in your library
+
+[profile.release]
+lto = true # Enable link-time optimization for faster performance
+
+

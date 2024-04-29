@@ -1,0 +1,47 @@
+name: Linux Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2.2.1
+        with:
+          prefix-key: ""
+          shared-key: ${{ matrix.target }}-${{ hashFiles('Cargo.lock') }}
+          key: ""
+      - name: Build
+        run: cargo build --workspace --release --target ${{ matrix.target }}
+      - name: Make artifacts directory
+        run: mkdir -p artifacts
+      - name: Package CLI
+        run: |
+          mv target/${{ matrix.target }}/release/control artifacts/control
+          tar -czvf artifacts/control-${{ matrix.target }}.tar.gz -C artifacts control
+          rm artifacts/control
+      - name: Package Parsers
+        run: |
+          mv target/${{ matrix.target }}/release/libparser_*.so artifacts
+          for file in artifacts/libparser_*.so; do
+            tar -czvf artifacts/$(basename $file .so)-${{ matrix.target }}.tar.gz -C artifacts $(basename $file)
+            rm $file
+          done
+      - name: Upload Artifacts
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+        run: gh release upload ${{ github.event.release.tag_name }} artifacts/* --clobber

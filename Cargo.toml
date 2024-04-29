@@ -1,0 +1,18 @@
+[package]
+name = "control-cli-workspace"
+version = "0.0.1"
+
+[lib]
+path = "lib.rs"
+
+[workspace]
+members = [
+    "cli",
+    "parsers/java",
+    "parsers/javascript",
+    "parsers/typescript",
+]
+
+[workspace.package]
+authors = ["Joshua Nathaniel Miller <jmiller@rise8.us>"]
+

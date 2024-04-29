@@ -1,0 +1,16 @@
+[package]
+name = "parser-java"
+version = "0.0.1"
+authors.workspace = true
+
+[lib]
+crate-type = ["dylib"]
+
+[dependencies]
+tree-sitter = "=0.20.9"
+tree-sitter-java = "=0.20.0"
+
+[profile.release]
+lto = true # Enable link-time optimization for faster performance
+
+

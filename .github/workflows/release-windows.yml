@@ -1,0 +1,53 @@
+name: Windows Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          - x86_64-pc-windows-gnu
+    steps:
+      - uses: actions/checkout@master
+      - name: Install mingw-w64
+        run: sudo apt-get update && sudo apt-get install -y mingw-w64
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2.2.1
+        with:
+          prefix-key: ""
+          shared-key: ${{ matrix.target }}-${{ hashFiles('Cargo.lock') }}
+          key: ""
+      - name: Build
+        run: cargo build --workspace --release --target ${{ matrix.target }}
+      - name: Make artifacts directory
+        run: mkdir -p artifacts
+      - name: Package CLI
+        run: |
+          mv target/${{ matrix.target }}/release/control.exe artifacts/control.exe
+          zip -j artifacts/control-${{ matrix.target }}.zip artifacts/control.exe
+          rm artifacts/control.exe
+      - name: Package Parsers
+        run: |
+          mv target/${{ matrix.target }}/release/parser_*.dll artifacts
+          for file in artifacts/parser_*.dll; do
+            mv $file artifacts/lib$(basename $file)
+            zip -j artifacts/lib$(basename $file .dll)-${{ matrix.target }}.zip artifacts/lib$(basename $file)
+            rm $file
+          done
+      - name: Upload Artifacts
+        run: ls -l artifacts
+      - name: Upload Artifacts
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+        run: gh release upload ${{ github.event.release.tag_name }} artifacts/* --clobber
+
