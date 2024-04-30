@@ -80,7 +80,7 @@ pub fn read_dir<T>(path: PathBuf, ext: &Vec<String>, f: fn(PathBuf) -> Option<Ve
 fn check_decompress_file() {
     let path = PathBuf::from("tests/fixtures/.control-log.java.br");
     let contents = decompress_file(path);
-    assert_eq!(String::from_utf8(contents).unwrap(), "\u{1}\0\0\0\0\0\0\0#\0\0\0\0\0\0\0./tests/resources/java/Program.java\u{1b}\0\0\0\0\0\0\0/* control HE-110 */$\0\0\0\0\0\0\0System.out.println(\"Hello, World!\");\u{5}\0\0\0\0\0\0\0\u{8}\0\0\0\0\0\0\0\u{5}\0\0\0\0\0\0\0,\0\0\0\0\0\0\0".to_string());
+    assert_eq!(String::from_utf8(contents).unwrap(), "\u{1}\0\0\0\0\0\0\0%\0\0\0\0\0\0\0cli/tests/resources/java/Program.java\u{14}\0\0\0\0\0\0\0/* control HE-110 */$\0\0\0\0\0\0\0System.out.println(\"Hello, World!\");\u{5}\0\0\0\0\0\0\0\u{8}\0\0\0\0\0\0\0\u{5}\0\0\0\0\0\0\0,\0\0\0\0\0\0\0".to_string());
 }
 
 #[test]

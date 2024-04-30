@@ -36,19 +36,14 @@ impl SupportedLanguage {
             let file_path = {
                 #[cfg(debug_assertions)]
                 {
-                    let file_path = match env::var("CARGO_MANIFEST_DIR") {
-                        Ok(path) => match PathBuf::from(path).parent() {
-                            Some(path) => path.join("target").join("debug").join(lib_name),
-                            None => {
-                                println!("Error: Could not get parent directory of config file");
-                                exit(1);
-                            }
-                        },
-                        Err(_) => {
-                            println!("Error: {}", "Could not find manifest variable");
+                    let file_path = match PathBuf::from(env!("CARGO_MANIFEST_DIR")).parent() {
+                        Some(path) => path.join("target").join("debug").join(lib_name),
+                        None => {
+                            println!("Error: Could not get parent directory of config file");
                             exit(1);
                         }
                     };
+
                     file_path
                 }
                 #[cfg(not(debug_assertions))]

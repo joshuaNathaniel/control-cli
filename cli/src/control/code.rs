@@ -127,24 +127,43 @@ fn check_get_control_commented_code() {
     use crate::parser::SupportedLanguage;
     let workspace_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let path = workspace_dir.join("tests/resources/js");
-    let ext = vec!["js".to_string()];
+    let ext = vec!["js".to_string(), "jsx".to_string()];
     let language = SupportedLanguage::JavaScript.language();
     let commented_code =
         get_control_commented_code(path, language, ext);
-    assert_eq!(commented_code.len(), 2);
-    assert!(commented_code[0].get_path().to_str().unwrap().contains("tests/resources/js/subdirectory/submodule.js"));
-    assert_eq!(commented_code[0].get_comment(), "// control SUB-1");
+    assert_eq!(commented_code.len(), 4);
+
+    assert!(commented_code[0].get_path().to_str().unwrap().contains("tests/resources/js/subdirectory/component.jsx"));
+    assert_eq!(commented_code[0].get_comment(), "/** control SUB-1 **/");
     assert_eq!(
         commented_code[0].get_content(),
+        "return <div>Component</div>;"
+    );
+
+    assert!(commented_code[1].get_path().to_str().unwrap().contains("tests/resources/js/subdirectory/submodule.js"));
+    assert_eq!(commented_code[1].get_comment(), "// control SUB-1");
+    assert_eq!(
+        commented_code[1].get_content(),
         "const submodule = () => {\n  return 'submodule';\n}"
     );
-    assert!(commented_code[1].get_path().to_str().unwrap().contains("tests/resources/js/index.js"));
+
+    assert!(commented_code[2].get_path().to_str().unwrap().contains("tests/resources/js/index.js"));
     assert_eq!(
-        commented_code[1].get_comment(),
+        commented_code[2].get_comment(),
+        "/*\n * control D-3RP\n*/"
+    );
+    assert_eq!(
+        commented_code[2].get_content(),
+        "function derp() {\n  console.log('derp');\n}"
+    );
+
+    assert!(commented_code[3].get_path().to_str().unwrap().contains("tests/resources/js/index.js"));
+    assert_eq!(
+        commented_code[3].get_comment(),
         "/* control HE-110 JS-1 */"
     );
     assert_eq!(
-        commented_code[1].get_content(),
+        commented_code[3].get_content(),
         "console.log('Hello world!');"
     );
 }
